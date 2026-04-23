@@ -3,7 +3,7 @@
 ## 你的网站信息（填写）
 
 - 网站名称：______________
-- Public Live URL：______________
+- Public Live URL：https://emily531678.github.io/yz-ga4/
 - GA4 Property / 数据流：Web（Measurement ID：`G-T39YW06F1C`）
 
 ## 已加入的 GA4 功能（本网站已完成）
@@ -89,4 +89,3 @@
 3. `vote_submit`
 
 你可以针对设备（mobile/desktop）、新老用户（用 `voter_status`）做分段对比，输出截图 + 结论 + 优化建议（例如按钮文案、引导提示、把投票按钮移到更显眼位置等）。
-

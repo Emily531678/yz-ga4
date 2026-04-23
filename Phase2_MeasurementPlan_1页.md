@@ -3,7 +3,7 @@
 ## Web/App Property
 
 - 网站名称：扬州六大著名景点（投票互动网页）
-- Public Live URL：https://traeyz919w.vercel.app
+- Public Live URL：https://emily531678.github.io/yz-ga4/
 - 平台：Web（静态站点）
 
 ## Business Objective（业务目标）
@@ -36,4 +36,3 @@
 ## Notes（给老师看的要点）
 
 - Custom Event（Events Interface 创建）建议：在 GA4 后台把 `vote_submit` 派生为 `vote_submit_custom`（满足 Phase 1“用界面创建 1 个 Custom Event”要求）。
-
