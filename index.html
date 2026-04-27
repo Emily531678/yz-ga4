@@ -395,31 +395,28 @@
         };
         
         let selectedPlace = null;
-        let hasVoted = false;
+        let hasVotedEver = false;
         
         // 页面加载时从本地存储读取数据
         document.addEventListener('DOMContentLoaded', function() {
             const savedData = localStorage.getItem('yangzhouVoteData');
-            const userVote = localStorage.getItem('yangzhouUserVote');
+            const votedFlag = localStorage.getItem('yangzhouHasVoted');
             
             if (savedData) {
                 voteData = JSON.parse(savedData);
             }
             
-            if (userVote) {
-                hasVoted = true;
-                selectedPlace = userVote;
-                // 禁用投票按钮并显示结果
-                document.getElementById('submitVote').disabled = true;
-                document.getElementById('submitVote').textContent = '已投票';
+            hasVotedEver = votedFlag === '1';
+
+            if (getTotalVotes() > 0) {
                 showResults();
             }
 
             gaSetUserProperties({
-                voter_status: hasVoted ? 'voted' : 'not_voted'
+                voter_status: hasVotedEver ? 'voted' : 'not_voted'
             });
             gaTrack('vote_page_view', {
-                voter_status: hasVoted ? 'voted' : 'not_voted'
+                voter_status: hasVotedEver ? 'voted' : 'not_voted'
             });
             
             // 更新总票数显示
@@ -429,8 +426,6 @@
             const options = document.querySelectorAll('.vote-option');
             options.forEach(option => {
                 option.addEventListener('click', function() {
-                    if (hasVoted) return;
-                    
                     // 移除之前的选择
                     options.forEach(opt => opt.classList.remove('selected'));
                     
@@ -449,14 +444,17 @@
             
             // 投票按钮点击事件
             document.getElementById('submitVote').addEventListener('click', function() {
-                if (!selectedPlace || hasVoted) return;
+                if (!selectedPlace) return;
                 
                 // 更新投票数据
                 voteData[selectedPlace]++;
                 
                 // 保存到本地存储
                 localStorage.setItem('yangzhouVoteData', JSON.stringify(voteData));
-                localStorage.setItem('yangzhouUserVote', selectedPlace);
+                if (!hasVotedEver) {
+                    hasVotedEver = true;
+                    localStorage.setItem('yangzhouHasVoted', '1');
+                }
 
                 gaSetUserProperties({
                     voter_status: 'voted'
@@ -466,15 +464,17 @@
                     total_votes: getTotalVotes()
                 });
                 
-                hasVoted = true;
-                this.disabled = true;
-                this.textContent = '已投票';
-                
                 // 显示结果
                 showResults();
                 
                 // 显示感谢消息
                 alert(`感谢您的投票！您选择了「${selectedPlace}」。`);
+
+                const options = document.querySelectorAll('.vote-option');
+                options.forEach(opt => opt.classList.remove('selected'));
+                selectedPlace = null;
+                this.disabled = true;
+                this.textContent = '再投一票';
             });
             
             // 简单的图片加载检查
@@ -535,7 +535,7 @@
             gaTrack('vote_results_view', {
                 total_votes: total,
                 selected_place: selectedPlace || '(none)',
-                voter_status: hasVoted ? 'voted' : 'not_voted'
+                voter_status: hasVotedEver ? 'voted' : 'not_voted'
             });
             
             // 如果用户已投票，高亮他们选择的项目
