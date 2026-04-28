@@ -384,7 +384,7 @@
             return Object.values(voteData).reduce((a, b) => a + b, 0);
         }
 
-        const VOTE_BACKEND_URL = '';
+        const VOTE_BACKEND_URL = 'https://script.google.com/macros/s/AKfycbwl1UcOf6ycOFHJDE7DUAWj53sBkVg5DB-z9qP1FBy__M5jsxlkyOS81OoNeDsdFaw/exec';
 
         async function voteBackendRequest(payload) {
             if (!VOTE_BACKEND_URL) return null;
@@ -394,13 +394,19 @@
             try {
                 const res = await fetch(VOTE_BACKEND_URL, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload),
                     signal: controller.signal
                 });
                 if (!res.ok) return null;
-                return await res.json();
+                const text = await res.text();
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    if (window.GA_DEBUG) console.debug('[vote-backend]', 'non-json', text.slice(0, 200));
+                    return null;
+                }
             } catch (e) {
+                if (window.GA_DEBUG) console.debug('[vote-backend]', 'request-failed', String(e && e.message ? e.message : e));
                 return null;
             } finally {
                 clearTimeout(timeout);
@@ -445,11 +451,11 @@
                 voteData = JSON.parse(savedData);
             }
 
-            await loadVotesFromBackend();
+            const backendLoaded = await loadVotesFromBackend();
             
             hasVotedEver = votedFlag === '1';
 
-            if (getTotalVotes() > 0) {
+            if (backendLoaded || getTotalVotes() > 0) {
                 showResults();
             }
 
