@@ -384,6 +384,45 @@
             return Object.values(voteData).reduce((a, b) => a + b, 0);
         }
 
+        const VOTE_BACKEND_URL = '';
+
+        async function voteBackendRequest(payload) {
+            if (!VOTE_BACKEND_URL) return null;
+
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 8000);
+            try {
+                const res = await fetch(VOTE_BACKEND_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload),
+                    signal: controller.signal
+                });
+                if (!res.ok) return null;
+                return await res.json();
+            } catch (e) {
+                return null;
+            } finally {
+                clearTimeout(timeout);
+            }
+        }
+
+        async function loadVotesFromBackend() {
+            const data = await voteBackendRequest({ action: 'get' });
+            if (!data || typeof data !== 'object' || !data.votes) return false;
+            voteData = { ...voteData, ...data.votes };
+            localStorage.setItem('yangzhouVoteData', JSON.stringify(voteData));
+            return true;
+        }
+
+        async function submitVoteToBackend(place) {
+            const data = await voteBackendRequest({ action: 'vote', place });
+            if (!data || typeof data !== 'object' || !data.votes) return null;
+            voteData = { ...voteData, ...data.votes };
+            localStorage.setItem('yangzhouVoteData', JSON.stringify(voteData));
+            return data;
+        }
+
         // 初始化投票数据
         let voteData = {
             "瘦西湖": 0,
@@ -398,13 +437,15 @@
         let hasVotedEver = false;
         
         // 页面加载时从本地存储读取数据
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             const savedData = localStorage.getItem('yangzhouVoteData');
             const votedFlag = localStorage.getItem('yangzhouHasVoted');
             
             if (savedData) {
                 voteData = JSON.parse(savedData);
             }
+
+            await loadVotesFromBackend();
             
             hasVotedEver = votedFlag === '1';
 
@@ -443,14 +484,16 @@
             });
             
             // 投票按钮点击事件
-            document.getElementById('submitVote').addEventListener('click', function() {
+            document.getElementById('submitVote').addEventListener('click', async function() {
                 if (!selectedPlace) return;
+
+                this.disabled = true;
                 
-                // 更新投票数据
-                voteData[selectedPlace]++;
-                
-                // 保存到本地存储
-                localStorage.setItem('yangzhouVoteData', JSON.stringify(voteData));
+                const backendResult = await submitVoteToBackend(selectedPlace);
+                if (!backendResult) {
+                    voteData[selectedPlace]++;
+                    localStorage.setItem('yangzhouVoteData', JSON.stringify(voteData));
+                }
                 if (!hasVotedEver) {
                     hasVotedEver = true;
                     localStorage.setItem('yangzhouHasVoted', '1');
