@@ -261,6 +261,7 @@
             </div>
             
             <button class="vote-button" id="submitVote" disabled>投我一票</button>
+            <button class="vote-button" id="refreshVotes" style="margin-top: 12px; background: #4a7c59;">刷新票数</button>
             <p id="syncStatus" style="text-align: center; margin-top: 10px; color: #666; font-size: 0.85rem;"></p>
             
             <!-- 投票结果区域 -->
@@ -440,6 +441,16 @@
             return data;
         }
 
+        async function refreshVotes() {
+            const ok = await loadVotesFromBackend();
+            if (ok) {
+                showResults();
+            } else {
+                updateTotalVotes();
+            }
+            return ok;
+        }
+
         // 初始化投票数据
         let voteData = {
             "瘦西湖": 0,
@@ -529,6 +540,12 @@
                     document.getElementById('submitVote').disabled = false;
                 });
             });
+
+            document.getElementById('refreshVotes').addEventListener('click', async function() {
+                this.disabled = true;
+                await refreshVotes();
+                this.disabled = false;
+            });
             
             // 投票按钮点击事件
             document.getElementById('submitVote').addEventListener('click', async function() {
@@ -536,8 +553,14 @@
 
                 this.disabled = true;
                 
-                const backendResult = await submitVoteToBackend(selectedPlace);
-                if (!backendResult) {
+                if (VOTE_BACKEND_URL) {
+                    const backendResult = await submitVoteToBackend(selectedPlace);
+                    if (!backendResult) {
+                        this.disabled = false;
+                        alert('云端同步失败，请稍后重试或点击“刷新票数”。');
+                        return;
+                    }
+                } else {
                     voteData[selectedPlace]++;
                     localStorage.setItem('yangzhouVoteData', JSON.stringify(voteData));
                 }
@@ -566,6 +589,12 @@
                 this.disabled = true;
                 this.textContent = '再投一票';
             });
+
+            if (VOTE_BACKEND_URL) {
+                setInterval(() => {
+                    refreshVotes();
+                }, 15000);
+            }
             
             // 简单的图片加载检查
             const images = document.querySelectorAll('img');
