@@ -261,6 +261,7 @@
             </div>
             
             <button class="vote-button" id="submitVote" disabled>投我一票</button>
+            <p id="syncStatus" style="text-align: center; margin-top: 10px; color: #666; font-size: 0.85rem;"></p>
             
             <!-- 投票结果区域 -->
             <div class="results-section" id="resultsSection">
@@ -414,18 +415,28 @@
         }
 
         async function loadVotesFromBackend() {
+            setSyncStatus('syncing');
             const data = await voteBackendRequest({ action: 'get' });
-            if (!data || typeof data !== 'object' || !data.votes) return false;
+            if (!data || typeof data !== 'object' || !data.votes) {
+                setSyncStatus('failed');
+                return false;
+            }
             voteData = { ...voteData, ...data.votes };
             localStorage.setItem('yangzhouVoteData', JSON.stringify(voteData));
+            setSyncStatus('ok');
             return true;
         }
 
         async function submitVoteToBackend(place) {
+            setSyncStatus('syncing');
             const data = await voteBackendRequest({ action: 'vote', place });
-            if (!data || typeof data !== 'object' || !data.votes) return null;
+            if (!data || typeof data !== 'object' || !data.votes) {
+                setSyncStatus('failed');
+                return null;
+            }
             voteData = { ...voteData, ...data.votes };
             localStorage.setItem('yangzhouVoteData', JSON.stringify(voteData));
+            setSyncStatus('ok');
             return data;
         }
 
@@ -441,9 +452,38 @@
         
         let selectedPlace = null;
         let hasVotedEver = false;
+        let lastSyncState = 'idle';
+
+        function setSyncStatus(state) {
+            lastSyncState = state;
+            const el = document.getElementById('syncStatus');
+            if (!el) return;
+            if (!VOTE_BACKEND_URL) {
+                el.textContent = '云端同步：未启用';
+                return;
+            }
+            if (state === 'syncing') {
+                el.textContent = '云端同步：同步中…';
+                return;
+            }
+            if (state === 'ok') {
+                const t = new Date();
+                const hh = String(t.getHours()).padStart(2, '0');
+                const mm = String(t.getMinutes()).padStart(2, '0');
+                const ss = String(t.getSeconds()).padStart(2, '0');
+                el.textContent = `云端同步：已连接（${hh}:${mm}:${ss}）`;
+                return;
+            }
+            if (state === 'failed') {
+                el.textContent = '云端同步：失败（请用 ?debug=1 查看原因）';
+                return;
+            }
+            el.textContent = '云端同步：未同步';
+        }
         
         // 页面加载时从本地存储读取数据
         document.addEventListener('DOMContentLoaded', async function() {
+            setSyncStatus(VOTE_BACKEND_URL ? 'syncing' : 'idle');
             const savedData = localStorage.getItem('yangzhouVoteData');
             const votedFlag = localStorage.getItem('yangzhouHasVoted');
             
@@ -452,6 +492,7 @@
             }
 
             const backendLoaded = await loadVotesFromBackend();
+            if (!backendLoaded && lastSyncState === 'syncing') setSyncStatus('failed');
             
             hasVotedEver = votedFlag === '1';
 
