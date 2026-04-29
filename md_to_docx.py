@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 
 from docx import Document
@@ -73,5 +74,8 @@ def md_to_docx(md_path: Path, out_path: Path) -> None:
 
 
 if __name__ == "__main__":
-    md_to_docx(Path("总报告_WebAnalytics_GA4.md"), Path("总报告_WebAnalytics_GA4.docx"))
-
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--in", dest="in_path", default="总报告_WebAnalytics_GA4.md")
+    parser.add_argument("--out", dest="out_path", default="总报告_WebAnalytics_GA4.docx")
+    args = parser.parse_args()
+    md_to_docx(Path(args.in_path), Path(args.out_path))
