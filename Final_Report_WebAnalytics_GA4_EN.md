@@ -39,9 +39,11 @@ To satisfy the requirement “Use the GA4 Events Interface to create one GA4 Cus
 - Custom event name: `vote_submit_custom`
 - Matching conditions:
   - `event_name` equals `vote_submit`
-- Copy parameters from source event: Enabled (copies `place`, `total_votes`, etc.)
+- Additional condition (parameter filter):
+  - `place` equals `瘦西湖`
+- Copy parameters from source event: Disabled (not required for counting; optional if you want to keep parameters in the derived event)
 
-This custom event is used as evidence of “custom event created in the GA4 interface” and can be used as the measurement target in Phase 3 (e.g., +10%).
+This custom event is used as evidence of “custom event created in the GA4 interface” and can also be used to measure votes for a specific attraction (“Shouxihu”) as a focused KPI target.
 
 ### 1.4 Phase 1 Deliverables
 
@@ -60,12 +62,14 @@ Increase user engagement and increase the number of completed votes, guiding mor
 ### 2.2 KPIs (2–3 Measurable KPIs)
 
 1. Primary KPI: Vote completions
-   - Definition: Event count of `vote_submit` (or `vote_submit_custom`)
+   - Definition: Event count of `vote_submit` (overall vote submissions)
 2. Funnel conversion rate (behavior KPI)
    - Definition: Conversion from `vote_option_select` → `vote_submit`
    - Calculation: `vote_submit` / `vote_option_select`
 3. Results viewing (engagement KPI)
    - Definition: Event count of `vote_results_view`, or `vote_results_view` / `vote_page_view`
+4. Attraction-specific vote KPI (optional)
+   - Definition: Event count of `vote_submit_custom` (only when `place = 瘦西湖`)
 
 ### 2.3 Phase 2 Deliverable
 
@@ -121,7 +125,7 @@ To reduce drop-off at Step1→Step2:
 
 ### 3.5 Quantitative Target (+10%)
 
-- Target: Increase `vote_submit_custom` (or `vote_submit`) by 10%
+- Target: Increase `vote_submit_custom` (votes for “瘦西湖”) by 10%
 - Measurement: Compare event counts and funnel conversion rates before vs after implementing improvements, within the same time window.
 
 ### 3.6 Phase 3 Deliverables
@@ -137,4 +141,3 @@ To reduce drop-off at Step1→Step2:
 ## 4. Conclusion
 
 This project successfully implemented GA4 tracking, configured custom interaction events for the voting flow, and created an additional custom event (`vote_submit_custom`) through the GA4 Events Interface. Using GA4 Funnel exploration, the project identified the main drop-off step and proposed actionable improvements with a measurable +10% growth target. Overall, the work meets the evaluation criteria of technical accuracy, strategic KPI alignment, and analytical insight.
-

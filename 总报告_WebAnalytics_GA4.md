@@ -39,7 +39,9 @@
 - Custom event name：`vote_submit_custom`
 - Matching condition：
   - `event_name` equals `vote_submit`
-- Copy parameters from source event：开启（复制 `place`、`total_votes` 等参数）
+- 额外条件（参数筛选）：
+  - `place` equals `瘦西湖`
+- Copy parameters from source event：未开启（计数不需要；如果想在派生事件保留参数可开启）
 
 该自定义事件用于在报告中作为“额外设置的自定义事件”展示，并可作为 Phase 3 的量化目标（例如提升 10%）。
 
@@ -60,12 +62,14 @@
 ### 2.2 KPIs（2–3 个可衡量指标）
 
 1. Primary KPI：投票完成数
-   - 定义：`vote_submit` 事件数量（或 `vote_submit_custom` 事件数量）
+   - 定义：`vote_submit` 事件数量（整体投票提交数）
 2. 漏斗转化率（行为 KPI）
    - 定义：从 `vote_option_select` → `vote_submit` 的转化率
    - 计算：`vote_submit` / `vote_option_select`
 3. 结果查看度（参与度 KPI）
    - 定义：`vote_results_view` 数量，或 `vote_results_view` / `vote_page_view`
+4. 景点投票 KPI（可选）
+   - 定义：`vote_submit_custom` 事件数量（仅统计 `place = 瘦西湖` 的投票提交）
 
 ### 2.3 Phase 2 交付物（Deliverable）
 
@@ -121,7 +125,7 @@ Breakdown（分群对比）：
 
 ### 3.5 量化目标（10% 增长目标）
 
-- 目标：将自定义事件 `vote_submit_custom`（或 `vote_submit`）提升 10%
+- 目标：将自定义事件 `vote_submit_custom`（仅统计 `place = 瘦西湖`）提升 10%
 - 衡量方式：对比优化前后同等时间窗口内 `vote_submit_custom` 的事件数量与漏斗转化率变化
 
 ### 3.6 Phase 3 交付物（Deliverables）
@@ -137,4 +141,3 @@ Breakdown（分群对比）：
 ## 4. 结论（总结）
 
 本项目完成 GA4 安装、关键交互事件埋点，并在 GA4 后台通过 Events Interface 创建额外自定义事件 `vote_submit_custom`。在 Phase 3 使用 Funnel exploration 对投票流程进行分析，定位主要流失点并提出可执行的优化方案与量化目标（提升 10%）。整体满足课程三项评估维度：技术准确性、战略匹配度与分析洞察。
-
