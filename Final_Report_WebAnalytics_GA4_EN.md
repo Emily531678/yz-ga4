@@ -96,20 +96,24 @@ Breakdown (segmentation):
 
 ### 3.3 Findings (Example Format — Replace with Your Own Numbers)
 
-Use the following structure and replace the numbers with your GA4 exploration results:
+### 3.3 Findings (Based on Latest Screenshots)
 
-- Step 1 `vote_page_view`: 6
-- Step 2 `vote_option_select`: 4 (Step1→Step2 conversion: 66.67%, drop-off: 33.33%)
-- Step 3 `vote_submit`: 4 (Step2→Step3 conversion: 100%)
+Time range (Funnel exploration): This month (Apr 1–Apr 29, 2026)
+
+- Step 1 `vote_page_view`: 29 (100%)
+- Step 2 `vote_option_select`: 25 (Step1→Step2 conversion: 86.21%, drop-off: 13.79%)
+- Step 3 `vote_submit`: 22 (Step2→Step3 conversion: 88.00%, drop-off: 12.00%)
 
 **Problem identified:**
 
-- The main drop-off happens at Step1→Step2 (users visit the page but do not select any attraction).
-- Step2→Step3 conversion is high, meaning users who select an option usually complete the vote.
+- Drop-offs exist in both Step1→Step2 and Step2→Step3. Step1→Step2 drop-off indicates some visitors do not start interacting; Step2→Step3 drop-off indicates some users select an attraction but do not complete submission.
+- Device breakdown highlights different friction points:
+  - Desktop has higher Step1→Step2 drop-off (25%) than mobile (9.52%).
+  - Mobile has higher Step2→Step3 drop-off (15.79%) than desktop (0%).
 
 ### 3.4 Fix Recommendations (How to Improve)
 
-To reduce drop-off at Step1→Step2:
+To reduce drop-off at Step1→Step2 and Step2→Step3:
 
 1. Strengthen the call-to-action and value proposition
    - Add a clearer message: “Vote to see the live results immediately”
@@ -117,9 +121,13 @@ To reduce drop-off at Step1→Step2:
 
 2. Reduce the friction to start voting
    - Add a “recommended” hint (e.g., highlight one option or show “tap any attraction to vote”)
-   - Ensure the voting section is visible on the first screen for mobile users
+   - Ensure the voting section is visible on the first screen and is prominent for desktop users (to address the higher desktop Step1→Step2 drop-off)
 
-3. Improve post-vote feedback loop (increase engagement)
+3. Improve submission completion, especially on mobile
+   - Increase button visibility/size and reduce interruption (replace alert pop-up with an in-page confirmation message)
+   - Add a clear post-selection hint (e.g., “Selected: X. Tap ‘Vote’ to submit.”)
+
+4. Improve post-vote feedback loop (increase engagement)
    - Auto-scroll to the results section after voting
    - Keep highlighting the user’s selected attraction in results (already implemented)
 
@@ -127,6 +135,17 @@ To reduce drop-off at Step1→Step2:
 
 - Target: Increase `vote_submit_custom` (votes for “瘦西湖”) by 10%
 - Measurement: Compare event counts and funnel conversion rates before vs after implementing improvements, within the same time window.
+
+## 4. KPI Snapshot (Based on Latest Screenshots)
+
+Time range (Events report): Last 28 days (Apr 1–Apr 28, 2026)
+
+- Total users: 34
+- `vote_submit` (overall vote submissions): 83 events (18 users)
+- `vote_submit_custom` (filtered custom event): 58 events (16 users)
+- `vote_option_select`: 125 events (25 users)
+- `vote_page_view`: 89 events (29 users)
+- `vote_results_view`: 175 events (18 users)
 
 ### 3.6 Phase 3 Deliverables
 
@@ -138,6 +157,6 @@ To reduce drop-off at Step1→Step2:
 - Written report:
   - Use `Phase3_Exploration_分析报告模板.md` and fill in your actual numbers
 
-## 4. Conclusion
+## 5. Conclusion
 
 This project successfully implemented GA4 tracking, configured custom interaction events for the voting flow, and created an additional custom event (`vote_submit_custom`) through the GA4 Events Interface. Using GA4 Funnel exploration, the project identified the main drop-off step and proposed actionable improvements with a measurable +10% growth target. Overall, the work meets the evaluation criteria of technical accuracy, strategic KPI alignment, and analytical insight.
